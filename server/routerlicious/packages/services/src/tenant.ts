@@ -88,7 +88,8 @@ export class TenantManager implements core.ITenantManager {
     }
 
     public async verifyToken(tenantId: string, token: string): Promise<void> {
-        winston.info(`TenantManager.verifyToken called (tenantId: ${tenantId}, token: ${token}, endpoint: ${this.endpoint})`);
+        winston.info(`TenantManager.verifyToken called (tenantId: ${tenantId}, 
+            token: ${token}, endpoint: ${this.endpoint})`);
         await Axios.post(
             `${this.endpoint}/api/tenants/${encodeURIComponent(tenantId)}/validate`,
             { token });
