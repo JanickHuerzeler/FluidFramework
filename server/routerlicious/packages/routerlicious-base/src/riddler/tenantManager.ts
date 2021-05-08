@@ -47,7 +47,7 @@ export class TenantManager {
         private readonly baseOrdererUrl: string,
         private readonly defaultHistorianUrl: string,
         private readonly defaultInternalHistorianUrl: string,
-        private readonly secretManager: ISecretManager
+        private readonly secretManager: ISecretManager,
     ) {}
 
     /**
@@ -78,14 +78,14 @@ export class TenantManager {
         if (!tenant) {
             winston.error("Tenant is disabled or does not exist.");
             return Promise.reject(
-                new Error("Tenant is disabled or does not exist.")
+                new Error("Tenant is disabled or does not exist."),
             );
         }
 
         const accessInfo = tenant.customData.externalStorageData?.accessInfo;
         if (accessInfo) {
             tenant.customData.externalStorageData.accessInfo = this.decryptAccessInfo(
-                accessInfo
+                accessInfo,
             );
         }
 
@@ -125,7 +125,7 @@ export class TenantManager {
         tenantId: string,
         storage: ITenantStorage,
         orderer: ITenantOrderer,
-        customData: ITenantCustomData
+        customData: ITenantCustomData,
     ): Promise<ITenantConfig & { key: string }> {
         winston.info(`Creating Tenant (tenantId: ${tenantId})`);
         const db = await this.mongoManager.getDatabase();
@@ -156,7 +156,7 @@ export class TenantManager {
      */
     public async updateStorage(
         tenantId: string,
-        storage: ITenantStorage
+        storage: ITenantStorage,
     ): Promise<ITenantStorage> {
         const db = await this.mongoManager.getDatabase();
         const collection = db.collection<ITenantDocument>(this.collectionName);
@@ -171,7 +171,7 @@ export class TenantManager {
      */
     public async updateOrderer(
         tenantId: string,
-        orderer: ITenantOrderer
+        orderer: ITenantOrderer,
     ): Promise<ITenantOrderer> {
         const db = await this.mongoManager.getDatabase();
         const collection = db.collection<ITenantDocument>(this.collectionName);
@@ -186,14 +186,14 @@ export class TenantManager {
      */
     public async updateCustomData(
         tenantId: string,
-        customData: ITenantCustomData
+        customData: ITenantCustomData,
     ): Promise<ITenantCustomData> {
         const db = await this.mongoManager.getDatabase();
         const collection = db.collection<ITenantDocument>(this.collectionName);
         const accessInfo = customData.externalStorageData?.accessInfo;
         if (accessInfo) {
             customData.externalStorageData.accessInfo = this.encryptAccessInfo(
-                accessInfo
+                accessInfo,
             );
         }
         await collection.update({ _id: tenantId }, { customData }, null);
@@ -233,7 +233,7 @@ export class TenantManager {
         await collection.update(
             { _id: tenantId },
             { key: encryptedTenantKey },
-            null
+            null,
         );
 
         return tenantKey;
@@ -244,7 +244,7 @@ export class TenantManager {
      * Will be removed at some point.
      */
     private attachDefaultsToTenantDocument(
-        tenantDocument: ITenantDocument
+        tenantDocument: ITenantDocument,
     ): void {
         // Ordering information was historically not included with the tenant. In the case where it is empty
         // we default it to the kafka orderer at the base server URL.
@@ -273,7 +273,7 @@ export class TenantManager {
      * Retrieves the raw database tenant document
      */
     private async getTenantDocument(
-        tenantId: string
+        tenantId: string,
     ): Promise<ITenantDocument> {
         const db = await this.mongoManager.getDatabase();
         const collection = db.collection<ITenantDocument>(this.collectionName);
@@ -316,14 +316,14 @@ export class TenantManager {
 
     private encryptAccessInfo(accessInfo: any): string {
         const encryptedAccessInfo = this.secretManager.encryptSecret(
-            JSON.stringify(accessInfo)
+            JSON.stringify(accessInfo),
         );
         return encryptedAccessInfo;
     }
 
     private decryptAccessInfo(encryptedAccessInfo: string): any {
         const accessInfo = JSON.parse(
-            this.secretManager.decryptSecret(encryptedAccessInfo)
+            this.secretManager.decryptSecret(encryptedAccessInfo),
         );
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return accessInfo;
