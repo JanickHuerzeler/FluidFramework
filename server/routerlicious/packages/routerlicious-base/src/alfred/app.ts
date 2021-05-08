@@ -98,7 +98,8 @@ export function create(
 
     // Error handlers
 
-    app.use(handleError());
+    winston.info(`Starting up alfred for env: ${app.get("env")}`);
+    app.use(handleError(app.get("env") === "development"));
 
     return app;
 }
