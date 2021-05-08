@@ -44,7 +44,7 @@ export function create(
      * Clients still need to verify the claims.
      */
     router.post("/tenants/:id/validate", (request, response) => {
-        winston.info(`POST /tenants/:id/validate (request.params: ${request.params})`);
+        winston.info(`POST /tenants/:id/validate (request.params: ${JSON.stringify(request.params)})`);
         const validP = manager.validateToken(getParam(request.params, "id"), request.body.token);
         returnResponse(validP, response);
     });

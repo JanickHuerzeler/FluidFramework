@@ -279,6 +279,7 @@ export class TenantManager {
         const collection = db.collection<ITenantDocument>(this.collectionName);
 
         const found = await collection.findOne({ _id: tenantId });
+        winston.info(`Looked for tenant document in mongodb. (found: ${JSON.stringify(found)})`);
         if (found.disabled) {
             return null;
         }
