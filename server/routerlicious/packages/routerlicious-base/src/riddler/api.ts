@@ -14,6 +14,7 @@ import {
 import { Response, Router } from "express";
 import { getParam } from "@fluidframework/server-services-utils";
 import { TenantManager } from "./tenantManager";
+import * as winston from "winston";
 
 export function create(
     collectionName: string,
@@ -43,6 +44,7 @@ export function create(
      * Clients still need to verify the claims.
      */
     router.post("/tenants/:id/validate", (request, response) => {
+        winston.info(`POST /tenants/:id/validate (request.params: ${request.params})`);
         const validP = manager.validateToken(getParam(request.params, "id"), request.body.token);
         returnResponse(validP, response);
     });

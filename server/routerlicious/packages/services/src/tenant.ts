@@ -14,6 +14,7 @@ import { generateToken, getCorrelationId } from "@fluidframework/server-services
 import * as core from "@fluidframework/server-services-core";
 import Axios from "axios";
 import { fromUtf8ToBase64 } from "@fluidframework/common-utils";
+import * as winston from "winston";
 
 export class Tenant implements core.ITenant {
     public get id(): string {
@@ -87,6 +88,7 @@ export class TenantManager implements core.ITenantManager {
     }
 
     public async verifyToken(tenantId: string, token: string): Promise<void> {
+        winston.info(`TenantManager.verifyToken called (tenantId: ${tenantId}, token: ${token}, endpoint: ${this.endpoint})`);
         await Axios.post(
             `${this.endpoint}/api/tenants/${encodeURIComponent(tenantId)}/validate`,
             { token });
