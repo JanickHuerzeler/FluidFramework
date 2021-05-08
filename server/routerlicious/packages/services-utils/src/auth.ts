@@ -13,6 +13,7 @@ import { NetworkError, validateTokenClaimsExpiration } from "@fluidframework/ser
 import type { ITenantManager } from "@fluidframework/server-services-core";
 import type { RequestHandler } from "express";
 import type { Provider } from "nconf";
+import * as winston from "winston";
 
 /**
  * Validates a JWT token to authorize routerlicious.
@@ -25,11 +26,15 @@ export function validateTokenClaims(
     tenantId: string): ITokenClaims {
     const claims = jwt.decode(token) as ITokenClaims;
 
+    winston.info(`claims: ${claims}`);
+
     if (!claims || claims.documentId !== documentId || claims.tenantId !== tenantId) {
+        winston.info("DocumentId and/or TenantId in token claims do not match request.");
         throw new NetworkError(403, "DocumentId and/or TenantId in token claims do not match request.");
     }
 
     if (claims.scopes === undefined || claims.scopes.length === 0) {
+        winston.info("Missing scopes in token claims.");
         throw new NetworkError(403, "Missing scopes in token claims.");
     }
 
@@ -89,17 +94,20 @@ export function verifyStorageToken(tenantManager: ITenantManager, config: Provid
         const isTokenExpiryEnabled = config.get("auth:enableTokenExpiration") as boolean;
         const authorizationHeader = request.header("Authorization");
         if (!authorizationHeader) {
+            winston.info(`Missing Authorization header.`);
             return res.status(403).send("Missing Authorization header.");
         }
         const regex = /Basic (.+)/;
         const tokenMatch = regex.exec(authorizationHeader);
         if (!tokenMatch || !tokenMatch[1]) {
+            winston.info(`Missing access token. (authorizationHeader: ${authorizationHeader})`);
             return res.status(403).send("Missing access token.");
         }
         const token = tokenMatch[1];
         const tenantId = getParam(request.params, "tenantId");
         const documentId = getParam(request.params, "id") || request.body.id;
         if (!tenantId || !documentId) {
+            winston.info(`Missing tenantId or documentId in request. (tenantId: ${tenantId}, documentId: ${documentId})`);
             return res.status(403).send("Missing tenantId or documentId in request.");
         }
         let claims: ITokenClaims;
@@ -109,16 +117,21 @@ export function verifyStorageToken(tenantManager: ITenantManager, config: Provid
                 validateTokenClaimsExpiration(claims, maxTokenLifetimeSec);
             }
         } catch (error) {
+            winston.error(`Error when validating Token Claims.`, error);
             if (error instanceof NetworkError) {
                 return res.status(error.code).send(error.message);
             }
             throw error;
         }
+
+        winston.info(`Going to verify token (${token})`);
+
         tenantManager.verifyToken(claims.tenantId, token)
             .then(() => {
                 next();
             })
             .catch((error) => {
+                winston.error(`tenantManager.verifyToken failed`,error);
                 return res.status(403).json(error);
             });
     };
