@@ -107,7 +107,7 @@ export function verifyStorageToken(tenantManager: ITenantManager, config: Provid
         const tenantId = getParam(request.params, "tenantId");
         const documentId = getParam(request.params, "id") || request.body.id;
         if (!tenantId || !documentId) {
-            winston.info(`Missing tenantId or documentId in request. (tenantId: ${tenantId}, documentId: ${documentId})`);
+            winston.info(`Missing tenantId or documentId in request. (tId: ${tenantId}, dId: ${documentId})`);
             return res.status(403).send("Missing tenantId or documentId in request.");
         }
         let claims: ITokenClaims;
