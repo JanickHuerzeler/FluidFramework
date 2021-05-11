@@ -74,6 +74,10 @@
             {
                 "id": "local",
                 "key": "43cfc3fbf04a97c0921fd23ff10f9e4b"
+            },
+            {
+                "id": "LocalhostRouterlicious",
+                "key": "InsecureAbrakadabraJWT"
             }
         ],
         "socketIoAdapter" : {
@@ -230,6 +234,17 @@
                 "type": "memory",
                 "url": "http://localhost:3003"
             }
+        },
+        {
+            "_id": "LocalhostRouterlicious",
+            "key": "InsecureAbrakadabraJWT",
+            "storage": {
+                "historianUrl": "http://localhost:3001",
+                "internalHistorianUrl": "http://historian:3000",
+                "url": "http://gitrest:3000",
+                "owner": "fluid",
+                "repository": "localfluid"
+            }            
         }
     ]
 }
