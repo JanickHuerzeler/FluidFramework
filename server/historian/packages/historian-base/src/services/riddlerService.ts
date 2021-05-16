@@ -68,19 +68,24 @@ export class RiddlerService implements ITenantService {
             return;
         }
 
+        winston.info(`cachedToken was ${cachedToken}!`);
+
         const tokenValidationUrl = `/api/tenants/${tenantId}/validate`;
         await this.restWrapper.post(tokenValidationUrl, { token })
             .catch(getRequestErrorTranslator(tokenValidationUrl, "POST", new NetworkError(403, "Invalid token")));
 
         // TODO: ensure token expiration validity as well using `validateTokenClaimsExpiration` from `services-client`
         let tokenLifetimeInSec = getTokenLifetimeInSec(token);
+        winston.info(`TokenLifetimeInSec (from JWT): ${tokenLifetimeInSec}`);
         // in case the service clock is behind, reducing the lifetime of token by 5%
         // to avoid using an expired token.
         if (tokenLifetimeInSec) {
             tokenLifetimeInSec = Math.round(tokenLifetimeInSec - ((tokenLifetimeInSec * 5) / 100));
+            winston.info(`Calculated 5% of tokenLifetime: ${tokenLifetimeInSec}`);
         }
+        winston.info(`Setting cache with tokenLifetimeInSec=${tokenLifetimeInSec}`);
         this.cache.set(token, "", tokenLifetimeInSec).catch((error) => {
-            winston.error(`Error caching token to redis`, error);
+            winston.error(`Error caching token to redis`, error, tokenLifetimeInSec);
         });
     }
 }

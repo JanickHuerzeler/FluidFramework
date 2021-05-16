@@ -26,7 +26,7 @@ export function validateTokenClaims(
     tenantId: string): ITokenClaims {
     const claims = jwt.decode(token) as ITokenClaims;
 
-    winston.info(`claims: ${claims}`);
+    winston.info(`claims: ${JSON.stringify(claims)}`);
 
     if (!claims || claims.documentId !== documentId || claims.tenantId !== tenantId) {
         winston.info("DocumentId and/or TenantId in token claims do not match request.");

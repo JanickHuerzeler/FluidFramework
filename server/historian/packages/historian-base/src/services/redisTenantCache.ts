@@ -18,6 +18,7 @@ export class RedisTenantCache {
         parameters?: IRedisParameters) {
         if (parameters?.expireAfterSeconds) {
             this.expireAfterSeconds = parameters.expireAfterSeconds;
+            winston.info(`RedisTenantCache.ctor: expireAfterSeconds=${this.expireAfterSeconds} from IRedisParameters`);
         }
 
         if (parameters?.prefix) {
@@ -38,9 +39,11 @@ export class RedisTenantCache {
         key: string,
         value: string = "",
         expireAfterSeconds: number = this.expireAfterSeconds): Promise<void> {
+        winston.info(`RedisTenantCache.set(expireAfterSeconds: ${expireAfterSeconds})`);
         const result = await this.client.set(this.getKey(key), value, "EX", expireAfterSeconds);
         if (result !== "OK")
         {
+            winston.info(`result was not OK: ${result}`);
             return Promise.reject(result);
         }
     }

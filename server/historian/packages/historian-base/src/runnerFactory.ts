@@ -44,9 +44,14 @@ export class HistorianResourcesFactory implements core.IResourcesFactory<Histori
             };
         }
 
+        winston.info(`HistorianResourcesFactory: redisConfig=${JSON.stringify(redisConfig)}`);
+        winston.info(`HistorianResourcesFactory: redisOptions=${JSON.stringify(redisOptions)}`);
+
         const redisParams = {
             expireAfterSeconds: redisConfig.keyExpireAfterSeconds as number | undefined,
         };
+
+        winston.info(`HistorianResourcesFactory: redisParams=${JSON.stringify(redisParams)}`);
 
         const redisClient = new Redis(redisOptions);
         const gitCache = new historianServices.RedisCache(redisClient, redisParams);
