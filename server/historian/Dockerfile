@@ -28,7 +28,8 @@ COPY packages/historian-base/package.json packages/historian-base/
 
 RUN npm install --unsafe-perm
 COPY . .
-RUN npm run build
+# Do not run linter
+RUN npm run build:genver && npm run build:compile 
 
 # Build that actually runs
 FROM base AS runner
