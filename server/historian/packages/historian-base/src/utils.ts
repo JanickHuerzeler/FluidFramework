@@ -31,10 +31,21 @@ export function normalizePort(val) {
 
 export function getTokenLifetimeInSec(token: string): number {
     const claims = jwt.decode(token) as ITokenClaims;
-    if (claims && claims.exp) {
-        return (claims.exp - Math.round((new Date().getTime()) / 1000));
+    if (!claims.exp || !claims.iat) {
+        throw new NetworkError(403, "Invalid token expiry");
     }
-    return undefined;
+    const lifeTimeMSec = (claims.exp * 1000) - (new Date()).getTime();
+    if (lifeTimeMSec < 0) {
+        throw new NetworkError(401, "Expired token");
+    }
+
+    winston.info(`getTokenLifetimeInSec: lifeTimeMSec=${lifeTimeMSec}`);
+
+    const lifeTimeInSec = Math.round(lifeTimeMSec * 1000);
+
+    winston.info(`getTokenLifetimeInSec: lifeTimeInSec=${lifeTimeInSec}`);
+
+    return lifeTimeInSec;
 }
 
 export function getTenantIdFromRequest(params: Params) {
