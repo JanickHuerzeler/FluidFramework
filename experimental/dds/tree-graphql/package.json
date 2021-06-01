@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@fluid-experimental/tree": "^0.40.0",
-    "@fluidframework/common-utils": "^0.30.0-0",
+    "@fluidframework/common-utils": "^0.30.0",
     "@graphql-codegen/plugin-helpers": "^1.18.2",
     "@graphql-codegen/visitor-plugin-common": "^1.18.2",
     "graphql": "^15.4.0",
@@ -57,7 +57,7 @@
     "eslint-plugin-prefer-arrow": "~1.2.2",
     "eslint-plugin-react": "~7.22.0",
     "eslint-plugin-unicorn": "~26.0.1",
-    "mocha": "^8.1.1",
+    "mocha": "^8.4.0",
     "nyc": "^15.0.0",
     "prettier": "^2.2.1",
     "rimraf": "^2.6.2",

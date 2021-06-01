@@ -11,9 +11,10 @@ import {
     ITenantOrderer,
     ITenantCustomData,
 } from "@fluidframework/server-services-core";
-import { Response, Router } from "express";
+import { Router } from "express";
 import { getParam } from "@fluidframework/server-services-utils";
 import * as winston from "winston";
+import { handleResponse } from "../utils";
 import { TenantManager } from "./tenantManager";
 
 export function create(
@@ -33,12 +34,6 @@ export function create(
         defaultInternalHistorianUrl,
         secretManager);
 
-    function returnResponse<T>(resultP: Promise<T>, response: Response) {
-        resultP.then(
-            (result) => response.status(200).json(result),
-            (error) => response.status(400).end(error.toString()));
-    }
-
     /**
      * Validates a tenant token. This only confirms that the token was correctly signed by the given tenant.
      * Clients still need to verify the claims.
@@ -46,7 +41,7 @@ export function create(
     router.post("/tenants/:id/validate", (request, response) => {
         winston.info(`POST /tenants/:id/validate (request.params: ${JSON.stringify(request.params)})`);
         const validP = manager.validateToken(getParam(request.params, "id"), request.body.token);
-        returnResponse(validP, response);
+        handleResponse(validP, response);
     });
 
     /**
@@ -55,7 +50,7 @@ export function create(
     router.get("/tenants/:id", (request, response) => {
         const tenantId = getParam(request.params, "id");
         const tenantP = manager.getTenant(tenantId);
-        returnResponse(tenantP, response);
+        handleResponse(tenantP, response);
     });
 
     /**
@@ -63,7 +58,7 @@ export function create(
      */
     router.get("/tenants", (request, response) => {
         const tenantP = manager.getAllTenants();
-        returnResponse(tenantP, response);
+        handleResponse(tenantP, response);
     });
 
     /**
@@ -71,7 +66,7 @@ export function create(
      */
     router.get("/tenants/:id/key", (request, response) => {
         const tenantP = manager.getTenantKey(getParam(request.params, "id"));
-        returnResponse(tenantP, response);
+        handleResponse(tenantP, response);
     });
 
     /**
@@ -79,7 +74,7 @@ export function create(
      */
     router.put("/tenants/:id/storage", (request, response) => {
         const storageP = manager.updateStorage(getParam(request.params, "id"), request.body);
-        returnResponse(storageP, response);
+        handleResponse(storageP, response);
     });
 
     /**
@@ -87,7 +82,7 @@ export function create(
      */
     router.put("/tenants/:id/orderer", (request, response) => {
         const storageP = manager.updateOrderer(getParam(request.params, "id"), request.body);
-        returnResponse(storageP, response);
+        handleResponse(storageP, response);
     });
 
     /**
@@ -96,7 +91,7 @@ export function create(
     router.put("/tenants/:id/customData", (request, response) => {
         const tenantId = getParam(request.params, "id");
         const customDataP = manager.updateCustomData(tenantId, request.body);
-        returnResponse(customDataP, response);
+        handleResponse(customDataP, response);
     });
 
     /**
@@ -105,7 +100,7 @@ export function create(
     router.put("/tenants/:id/key", (request, response) => {
         const tenantId = getParam(request.params, "id");
         const refreshKeyP = manager.refreshTenantKey(tenantId);
-        return returnResponse(refreshKeyP, response);
+        return handleResponse(refreshKeyP, response);
     });
 
     /**
@@ -122,7 +117,7 @@ export function create(
             tenantOrderer,
             tenantCustomData,
         );
-        returnResponse(tenantP, response);
+        handleResponse(tenantP, response);
     });
 
     /**
@@ -131,7 +126,7 @@ export function create(
     router.delete("/tenants/:id", (request, response) => {
         const tenantId = getParam(request.params, "id");
         const tenantP = manager.disableTenant(tenantId);
-        returnResponse(tenantP, response);
+        handleResponse(tenantP, response);
     });
 
     return router;
