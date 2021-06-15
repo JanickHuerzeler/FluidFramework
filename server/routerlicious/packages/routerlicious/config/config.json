@@ -248,7 +248,7 @@
                 "url": "http://gitrest:3000",
                 "owner": "fluid",
                 "repository": "localfluid"
-            }            
+            }
         },
         {
             "_id": "ExternalRouterlicious",
@@ -259,7 +259,15 @@
                 "url": "http://gitrest:3000",
                 "owner": "fluid",
                 "repository": "localfluid"
-            }            
+            }
         }
-    ]
+    ],
+    "metric":
+    {
+      "client": "telegraf",
+      "telegraf": {
+          "host": "telegraf",
+          "port": 8094
+        }
+    }
 }
